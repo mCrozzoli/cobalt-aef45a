@@ -44,6 +44,10 @@ footer{color:var(--tx3);font-size:11.5px;margin-top:22px;line-height:1.6}
 <h1>Fitness</h1>
 <p class="sub">3 sessions a week &middot; 45 min &middot; target ~74 kg lean</p>
 <div id="coach"></div>
+<div id="expbar" style="display:none;margin:2px 0 18px">
+  <button id="expbtn" style="width:100%;border-radius:12px;padding:13px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;background:#1e232c;color:#e9edf4;border:1px solid #2a3140">Export log as .md for Claude</button>
+  <div id="expnote" style="font-size:11.5px;color:#6b7789;margin-top:6px;text-align:center"></div>
+</div>
 
 <a class="card" href="training-log.html">
   <div class="ic i1">&#9878;</div>
@@ -95,5 +99,18 @@ if('serviceWorker' in navigator){
 </script>
 <script src="coach.js"></script>
 <script src="coach-ui.js"></script>
-<script>renderCoach(document.getElementById("coach"));</script>
+<script>
+renderCoach(document.getElementById("coach"));
+(function(){
+  if(!window.FIT) return;
+  var st=FIT.status();
+  if(!st.stats.sessions) return;
+  var bar=document.getElementById('expbar');
+  bar.style.display='block';
+  document.getElementById('expnote').textContent =
+    st.stats.sessions + (st.stats.sessions===1?' session':' sessions') +
+    ' · ' + st.stats.checkins + (st.stats.checkins===1?' check-in':' check-ins');
+  document.getElementById('expbtn').onclick=function(){ FIT.exportMd(); };
+})();
+</script>
 </body></html>
