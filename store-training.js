@@ -33,7 +33,12 @@
     '.dcard h3{margin:0 0 6px;font-size:15px;color:#e9edf4}' +
     '.dcard p{font-size:13px;color:#9aa6b8;margin:0 0 10px}' +
     '.nostore{background:#241f12;border:1px solid #4a3d22;color:#e6d4ae;border-radius:12px;' +
-    'padding:12px;margin:12px 0;font-size:13px}';
+    'padding:12px;margin:12px 0;font-size:13px}' +
+    '.setrow input.pre{color:#6f7b8d}' +
+    '.lastt i{color:#7fcaa0;font-style:normal;font-weight:650}' +
+    '.prehint{font-size:12.2px;color:#7e8a9c;background:#171b22;border:1px solid #2a3140;' +
+    'border-radius:11px;padding:9px 11px;margin:10px 0 2px}' +
+    '.prehint b{color:#c3d3e6}';
   document.head.appendChild(css);
 
   var OK = available();
@@ -90,6 +95,35 @@
     }
     return null;
   }
+  function recFor(ex) {
+    var l = lastFor(ex.dataset.name);
+    if (!l) return null;
+    var withKg = l.rows.filter(function (r) { return r[0]; });
+    if (!withKg.length) return null;
+    var kg = parseFloat(withKg[0][0]);
+    if (isNaN(kg)) return null;
+    var top = parseInt(ex.dataset.top || '0', 10);
+    var inc = parseFloat(ex.dataset.inc || '2.5');
+    var noprog = ex.dataset.noprog === '1';
+    var done = l.rows.filter(function (r) { return r[0] && r[1]; });
+    var allTop = !noprog && top && done.length &&
+                 done.every(function (r) { return parseFloat(r[1]) >= top; });
+    return { kg: allTop ? kg + inc : kg, up: !!allTop, last: kg, date: l.date };
+  }
+
+  function prefill(sec) {
+    sec.querySelectorAll('.ex').forEach(function (ex) {
+      var r = recFor(ex);
+      if (!r) return;
+      ex.querySelectorAll('.setrow').forEach(function (row) {
+        var w = row.querySelector('.w');
+        if (w.value) return;
+        w.value = r.kg;
+        w.classList.add('pre');
+      });
+    });
+  }
+
   function paintLast() {
     document.querySelectorAll('.ex').forEach(function (ex) {
       var old = ex.querySelector('.lastt');
@@ -97,6 +131,8 @@
       var l = lastFor(ex.dataset.name);
       if (!l) return;
       var txt = l.rows.map(function (r) { return (r[0] || '?') + ' kg x ' + (r[1] || '?'); }).join('   ');
+      var r2 = recFor(ex);
+      if (r2 && r2.up) txt += ' &nbsp;<i>&rarr; go to ' + r2.kg + ' kg</i>';
       var d = document.createElement('div');
       d.className = 'lastt';
       d.innerHTML = '<b>Last time (' + l.date + '):</b> ' + txt;
@@ -107,8 +143,25 @@
 
   /* ---------- wire up each day ---------- */
   secs().forEach(function (sec) {
-    if (OK) restore(sec, get('draft.' + sec.dataset.s, null));
-    sec.addEventListener('input', function () { saveDraft(sec); });
+    var draft = OK ? get('draft.' + sec.dataset.s, null) : null;
+    if (draft) restore(sec, draft); else prefill(sec);
+
+    var head = sec.querySelector('.dayhead');
+    if (head && sessions.length && !sec.querySelector('.prehint')) {
+      var hint = document.createElement('div');
+      hint.className = 'prehint';
+      hint.innerHTML = '<b>Weights are filled in from last time.</b> Grey means untouched &mdash; ' +
+        'change it if you lift something different. An exercise only counts as done once you ' +
+        'enter the reps.';
+      head.parentNode.insertBefore(hint, head.nextSibling);
+    }
+
+    sec.addEventListener('input', function (e) {
+      if (e.target && e.target.classList && e.target.classList.contains('pre')) {
+        e.target.classList.remove('pre');
+      }
+      saveDraft(sec);
+    });
     sec.addEventListener('click', function (e) {
       if (e.target.closest && e.target.closest('.chk')) setTimeout(function () { saveDraft(sec); }, 0);
     });
@@ -137,16 +190,19 @@
 
     save.onclick = function () {
       var o = snap(sec);
-      var any = Object.keys(o.ex).some(function (k) {
-        return o.ex[k].some(function (r) { return r[0] || r[1]; });
+      /* only keep sets where reps were entered — a pre-filled weight alone
+         is a suggestion, not something you did */
+      Object.keys(o.ex).forEach(function (k) {
+        var rows = o.ex[k].filter(function (r) { return r[1]; });
+        if (rows.length) o.ex[k] = rows; else delete o.ex[k];
       });
-      if (!any) { say('Nothing logged yet'); return; }
+      if (!Object.keys(o.ex).length) { say('Enter your reps first'); return; }
       o.date = o.date || today();
       o.day = sec.dataset.s;
       sessions.push(o);
       sessions.sort(function (a, b) { return a.date < b.date ? -1 : 1; });
       if (!set('sessions', sessions)) { say('Could not save'); return; }
-      wipe(); paintLast(); renderData();
+      wipe(); paintLast(); prefill(sec); renderData();
       say('Session saved');
     };
 
@@ -158,7 +214,7 @@
         return;
       }
       clearTimeout(timer); armed = false; dis.textContent = 'Clear day';
-      wipe(); say('Day cleared');
+      wipe(); prefill(sec); say('Day cleared');
     };
   });
 
