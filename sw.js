@@ -1,5 +1,5 @@
 /* Offline cache. Bump CACHE when the pages change. */
-const CACHE = 'fitness-v4';
+const CACHE = 'fitness-v5';
 const FILES = [
   './', './index.html',
   './training-log.html', './daily-log.html', './food-playbook.html',
