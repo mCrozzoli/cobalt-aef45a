@@ -77,9 +77,9 @@ footer{color:var(--tx3);font-size:11.5px;margin-top:22px;line-height:1.6}
 </div>
 
 <div class="hint">
-  <b>Nothing you type is stored.</b> These pages keep entries in memory only.
-  Tap <b>Copy log</b>, <b>Copy day</b> or <b>Save check-in</b> when you finish and paste it
-  into the Fitness chat with Claude &mdash; that is what builds your history.
+  <b>Your data stays on this phone.</b> Sessions, food and check-ins are saved in Safari here
+  and never sent anywhere. Clearing Safari's website data deletes them, so export a backup
+  now and then &mdash; the button is in each page's last tab.
 </div>
 
 <footer>Private to you. Works offline once loaded.</footer>
@@ -104,13 +104,22 @@ renderCoach(document.getElementById("coach"));
 (function(){
   if(!window.FIT) return;
   var st=FIT.status();
-  if(!st.stats.sessions) return;
   var bar=document.getElementById('expbar');
-  bar.style.display='block';
-  document.getElementById('expnote').textContent =
-    st.stats.sessions + (st.stats.sessions===1?' session':' sessions') +
-    ' · ' + st.stats.checkins + (st.stats.checkins===1?' check-in':' check-ins');
-  document.getElementById('expbtn').onclick=function(){ FIT.exportMd(); };
+  var btn=document.getElementById('expbtn');
+  var note=document.getElementById('expnote');
+  bar.style.display='block';                 /* always visible — never hunt for it */
+  if(st.stats.sessions){
+    note.textContent = st.stats.sessions + (st.stats.sessions===1?' session':' sessions') +
+      ' · ' + st.stats.checkins + (st.stats.checkins===1?' check-in':' check-ins') +
+      ' · send this file to Claude for a new programme';
+    btn.onclick=function(){ FIT.exportMd(); btn.textContent='Downloaded ✓';
+      setTimeout(function(){ btn.textContent='Export log as .md for Claude'; },2200); };
+  } else {
+    btn.disabled=true;
+    btn.style.opacity='.45';
+    btn.style.cursor='default';
+    note.textContent='Nothing to export yet — finish and save a session first';
+  }
 })();
 </script>
 </body></html>
