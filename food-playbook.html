@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Food Playbook</title>
+<style>
+:root{
+  --bg:#0e1014; --card:#171b22; --card2:#1e232c; --line:#2a3140;
+  --tx:#e9edf4; --tx2:#9aa6b8; --tx3:#6b7789;
+  --acc:#5fb98a; --acc2:#4ea3e0; --warn:#e0b24e; --r:14px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--tx);padding-bottom:40px;
+ font:16px/1.55 ui-sans-serif,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+.wrap{max-width:760px;margin:0 auto;padding:0 14px}
+header{padding:22px 0 10px}
+h1{font-size:21px;margin:0 0 4px;letter-spacing:-.02em}
+.sub{color:var(--tx2);font-size:13.5px;margin:0}
+nav{position:sticky;top:0;z-index:30;background:rgba(14,16,20,.94);backdrop-filter:blur(12px);
+ border-bottom:1px solid var(--line);margin:0 -14px;padding:8px 14px}
+.tabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:0 0 auto;padding:8px 13px;border-radius:999px;border:1px solid var(--line);
+ background:var(--card);color:var(--tx2);font-size:13.5px;font-weight:600;cursor:pointer;white-space:nowrap}
+.tab[aria-selected="true"]{background:var(--acc);border-color:var(--acc);color:#08170f}
+section[hidden]{display:none}
+h2{font-size:19px;margin:20px 0 4px;letter-spacing:-.01em}
+h2+p.lead{margin:0 0 4px;color:var(--tx2);font-size:13.5px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px;margin:12px 0}
+.card h3{margin:0 0 8px;font-size:15.5px}
+.card p,.card li{font-size:13.8px;color:var(--tx2)}
+.card p:last-child{margin-bottom:0}
+ul{padding-left:18px;margin:6px 0}
+li{margin-bottom:5px}
+b,strong{color:var(--tx);font-weight:650}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:8px;margin:12px 0}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:11px 12px}
+.kpi .n{font-size:22px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.kpi .l{font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--tx3);font-weight:700;margin-top:2px}
+.kpi.p .n{color:var(--acc)} .kpi.c .n{color:var(--acc2)} .kpi.f .n{color:var(--warn)}
+table{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px}
+th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line);color:var(--tx2);vertical-align:top}
+th{color:var(--tx3);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;font-weight:700}
+td b{color:var(--tx)}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.meal{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:13px;margin-bottom:10px}
+.meal .t{font-weight:650;font-size:15px;margin-bottom:3px}
+.meal .m{font-size:11.5px;color:var(--acc);font-weight:700;letter-spacing:.04em;margin-bottom:6px}
+.meal .d{font-size:13.5px;color:var(--tx2)}
+.note{background:#1a2418;border:1px solid #33482f;border-radius:var(--r);padding:13px;margin:12px 0;font-size:13.6px;color:#c6dcbf}
+.note b{color:#e2f3dc}
+.warn{background:#241f12;border-color:#4a3d22;color:#e6d4ae}
+.warn b{color:#fbe9c4}
+.slot{border-left:3px solid var(--acc);border-radius:0 10px 10px 0;background:var(--card2);
+ padding:11px 13px;margin-bottom:9px}
+.slot .h{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--acc);font-weight:700;margin-bottom:5px}
+.slot .h span{color:var(--tx3);letter-spacing:0;text-transform:none;font-weight:600;font-size:11.5px}
+.slot p{margin:0;font-size:13.5px;color:var(--tx2)}
+.slot.b{border-left-color:var(--acc2)} .slot.b .h{color:var(--acc2)}
+.slot.c{border-left-color:var(--warn)} .slot.c .h{color:var(--warn)}
+.slot.d{border-left-color:#8e8ad9} .slot.d .h{color:#a5a1e8}
+footer{color:var(--tx3);font-size:11.5px;padding:24px 0 10px;line-height:1.6}
+</style>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0e1014">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="icon-192.png">
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>Food playbook</h1>
+  <p class="sub">Vegetarian &middot; eggs, dairy, legumes and protein powder &middot; built for a family kitchen and an office lunch.</p>
+</header>
+
+<nav><div class="tabs" role="tablist"><a class="tab" href="./" aria-label="Home" style="text-decoration:none;display:flex;align-items:center;justify-content:center;min-width:38px;font-size:16px">&#8962;</a>
+  <button class="tab" data-t="num" aria-selected="true">The numbers</button>
+  <button class="tab" data-t="build" aria-selected="false">Build a meal</button>
+  <button class="tab" data-t="bfast" aria-selected="false">Breakfast</button>
+  <button class="tab" data-t="lunch" aria-selected="false">Lunch</button>
+  <button class="tab" data-t="dinner" aria-selected="false">Dinner</button>
+  <button class="tab" data-t="shop" aria-selected="false">Shopping</button>
+  <button class="tab" data-t="log" aria-selected="false">Photo logging</button>
+</div></nav>
+
+<!-- ============ NUMBERS ============ -->
+<section data-s="num">
+<h2>The numbers</h2>
+<p class="lead">Estimated from 42 y, 179 cm, ~77.5 kg, desk job, 3 lifting sessions a week.</p>
+
+<div class="kpis">
+  <div class="kpi"><div class="n">~2350</div><div class="l">kcal to maintain</div></div>
+  <div class="kpi"><div class="n">1900</div><div class="l">kcal target</div></div>
+  <div class="kpi p"><div class="n">140g</div><div class="l">protein</div></div>
+  <div class="kpi f"><div class="n">~65g</div><div class="l">fat</div></div>
+  <div class="kpi c"><div class="n">~190g</div><div class="l">carbs</div></div>
+</div>
+
+<div class="card">
+<h3>What this actually gets you</h3>
+<p>A deficit of about 450 kcal a day &rarr; roughly <b>0.4 kg per week</b>. From 77.5 kg that is
+<b>~74 kg by mid-October</b> &mdash; the weight you felt strongest at &mdash; while lifting three times
+a week so what you lose is fat and what stays is muscle.</p>
+<p>Going faster is possible and a bad idea. Below about 1700 kcal you lose muscle,
+sleep gets worse, and with a 3-year-old in the house you cannot afford either.</p>
+</div>
+
+<div class="card">
+<h3>The three rules that do 90&#37; of the work</h3>
+<ul>
+<li><b>Protein first, every meal.</b> If a meal has 35&ndash;45 g of protein in it, the rest tends to
+take care of itself. This is the hardest part of being vegetarian in a deficit, and the most important.</li>
+<li><b>Do not drink calories.</b> Juice, sodas, the second beer, the oat-milk latte with syrup.
+Coffee, tea, water, and milk with protein in it are fine.</li>
+<li><b>Eat the same breakfast and lunch on weekdays.</b> You control those two meals; make them
+automatic so you have zero decisions to make and dinner can be whatever the family is eating.</li>
+</ul>
+</div>
+
+<div class="note"><b>The 71 kg trap.</b> You said you sit at 71 kg when you are not training.
+That is not the goal here. 74 kg with muscle looks and feels completely different from
+71 kg without it. Judge this by the mirror, your belt, and what you lift &mdash; not by the scale alone.</div>
+
+<div class="card">
+<h3>Weighing yourself</h3>
+<p>Three mornings a week, straight after the toilet, before eating. Track the
+<b>weekly average</b> in the Progress tab of your training log, never a single day. Daily swings of
+&plusmn;1 kg are water and food volume, not fat.</p>
+<p>If the weekly average has not moved in <b>three</b> consecutive weeks, take 150 kcal off
+&mdash; roughly one slice of rugbr&oslash;d with topping, or a handful of nuts.</p>
+</div>
+
+<div class="card">
+<h3>Where the protein comes from</h3>
+<table>
+<tr><th>Food</th><th>Portion</th><th class="num">Protein</th><th class="num">kcal</th></tr>
+<tr><td><b>Skyr</b> (plain)</td><td>250 g</td><td class="num">28 g</td><td class="num">160</td></tr>
+<tr><td><b>Whey / plant protein</b></td><td>30 g scoop</td><td class="num">24 g</td><td class="num">120</td></tr>
+<tr><td><b>Hytteost</b> / cottage cheese</td><td>200 g</td><td class="num">24 g</td><td class="num">200</td></tr>
+<tr><td><b>Firm tofu</b></td><td>150 g</td><td class="num">22 g</td><td class="num">180</td></tr>
+<tr><td><b>Kvark / kvarg</b> (plain)</td><td>200 g</td><td class="num">22 g</td><td class="num">150</td></tr>
+<tr><td><b>Tempeh</b></td><td>100 g</td><td class="num">19 g</td><td class="num">190</td></tr>
+<tr><td><b>Red lentils</b> (dry weight)</td><td>80 g</td><td class="num">19 g</td><td class="num">280</td></tr>
+<tr><td><b>Eggs</b></td><td>3 large</td><td class="num">19 g</td><td class="num">215</td></tr>
+<tr><td><b>Edamame</b></td><td>150 g</td><td class="num">17 g</td><td class="num">180</td></tr>
+<tr><td><b>Halloumi</b></td><td>80 g</td><td class="num">17 g</td><td class="num">260</td></tr>
+<tr><td><b>Chickpeas</b> (tin, drained)</td><td>240 g</td><td class="num">15 g</td><td class="num">280</td></tr>
+<tr><td><b>Skummetm&aelig;lk</b></td><td>300 ml</td><td class="num">10 g</td><td class="num">105</td></tr>
+<tr><td><b>Rugbr&oslash;d</b></td><td>2 slices</td><td class="num">6 g</td><td class="num">160</td></tr>
+</table>
+<p style="margin-top:10px">Hitting 140 g means roughly <b>four protein anchors a day</b>.
+Since you are open to protein powder, one of those four can take thirty seconds &mdash;
+that is the single biggest convenience lever you have.</p>
+</div>
+</section>
+
+<!-- ============ BUILD A MEAL ============ -->
+<section data-s="build" hidden>
+<h2>Build a meal</h2>
+<p class="lead">No fixed menu. Pick one from each slot and you have a meal that lands near target &mdash; whatever is in the fridge, whatever the family is eating.</p>
+
+<div class="card">
+<h3>The four slots</h3>
+
+<div class="slot"><div class="h">1 &middot; Protein anchor <span>&mdash; pick one, non-negotiable</span></div>
+<p>250 g skyr &middot; 200 g hytteost &middot; 200 g kvark &middot; 3 eggs &middot; 150 g firm tofu &middot;
+100 g tempeh &middot; 240 g tin of chickpeas or beans &middot; 150 g edamame &middot; 80 g halloumi &middot;
+30 g protein powder</p></div>
+
+<div class="slot b"><div class="h">2 &middot; Base <span>&mdash; pick one, this is your portion control</span></div>
+<p>2 slices rugbr&oslash;d &middot; 60 g dry pasta &middot; 150 g cooked rice &middot; 200 g potatoes &middot;
+50 g oats &middot; 60 g dry couscous or bulgur &middot; 1 large tortilla</p></div>
+
+<div class="slot c"><div class="h">3 &middot; Vegetables <span>&mdash; as much as you like, genuinely</span></div>
+<p>Whatever is cheap and looks good. Frozen counts. Tinned tomatoes count.
+A bag of spinach wilted into anything counts. There is no wrong answer in this slot and
+no reason to measure it.</p></div>
+
+<div class="slot d"><div class="h">4 &middot; Flavour <span>&mdash; pick one, keep it to one</span></div>
+<p>15 g tahini &middot; 10 g olive oil &middot; 20 g pesto &middot; 15 g peanut butter &middot;
+30 g feta &middot; 30 g grated cheese &middot; 3 tbsp skyr-and-garlic sauce</p></div>
+
+<p style="margin-top:12px">One from each slot lands at roughly <b>500&ndash;650 kcal and 30&ndash;40 g protein</b>.
+Three of those a day plus one snack is the whole plan. That is all the arithmetic there is.</p>
+</div>
+
+<div class="note"><b>Why a system instead of a menu.</b> A 7-day menu assumes a week that goes to plan.
+Yours will not &mdash; a nap collapses, someone gets a cold, a seminar runs late. A slot system
+survives all of that, because the decision at 18:40 stops being &ldquo;what was I supposed to cook&rdquo;
+and becomes &ldquo;which protein do I have&rdquo;.</p></div>
+
+<h2 style="margin-top:24px">Ten assemblies, all under 10 minutes</h2>
+<p class="lead">Tested against the slots above. Protein and calories are approximate.</p>
+
+<div class="meal"><div class="m">2 MIN &middot; 35 G PROTEIN</div><div class="t">Skyr bowl</div>
+<div class="d">250 g skyr, 30 g oats, frozen berries, 10 g almonds. Breakfast, dessert or a rescue meal. ~430 kcal</div></div>
+
+<div class="meal"><div class="m">1 MIN &middot; 34 G PROTEIN</div><div class="t">The emergency shake</div>
+<div class="d">30 g protein powder, 300 ml milk, half a banana, 10 g peanut butter.
+Not a meal you are proud of. Far better than the meal you skip. ~380 kcal</div></div>
+
+<div class="meal"><div class="m">6 MIN &middot; 35 G PROTEIN</div><div class="t">Eggs on rugbr&oslash;d</div>
+<div class="d">3 scrambled eggs, 1 slice rugbr&oslash;d, 100 g hytteost on the side, tomato.
+The 3-year-old eats the same thing. ~470 kcal</div></div>
+
+<div class="meal"><div class="m">5 MIN &middot; 32 G PROTEIN</div><div class="t">Chickpea &amp; feta plate</div>
+<div class="d">Tin of chickpeas, 40 g feta, bag of spinach, tomato, cucumber, olive oil, lemon,
+1 slice rugbr&oslash;d. No cooking at all. ~600 kcal</div></div>
+
+<div class="meal"><div class="m">8 MIN &middot; 38 G PROTEIN</div><div class="t">Four-egg omelette</div>
+<div class="d">4 eggs, frozen spinach, 30 g grated cheese, 1 slice rugbr&oslash;d.
+The most reliable 8 minutes in the kitchen. ~570 kcal</div></div>
+
+<div class="meal"><div class="m">9 MIN &middot; 34 G PROTEIN</div><div class="t">Halloumi &amp; couscous</div>
+<div class="d">80 g halloumi pan-fried, 60 g dry couscous, tomato-cucumber salad, tahini-lemon.
+Couscous only needs boiling water. ~650 kcal</div></div>
+
+<div class="meal"><div class="m">10 MIN &middot; 36 G PROTEIN</div><div class="t">Tofu stir-fry</div>
+<div class="d">150 g firm tofu cubed, frozen stir-fry vegetables, 150 g cooked rice,
+soy + peanut butter + lime. One pan. ~640 kcal</div></div>
+
+<div class="meal"><div class="m">10 MIN &middot; 33 G PROTEIN</div><div class="t">White bean pasta</div>
+<div class="d">60 g dry pasta, tin of tomatoes, tin of white beans, garlic, 20 g parmesan, chilli.
+Cook the beans into the sauce while the pasta boils. ~620 kcal</div></div>
+
+<div class="meal"><div class="m">7 MIN &middot; 30 G PROTEIN</div><div class="t">Loaded potatoes</div>
+<div class="d">200 g leftover boiled potatoes, 200 g hytteost, chives, rocket, olive oil, lots of pepper.
+Works cold, works at a desk. ~520 kcal</div></div>
+
+<div class="meal"><div class="m">7 MIN &middot; 31 G PROTEIN</div><div class="t">Red lentil dahl</div>
+<div class="d">From a batch made on Sunday: reheat, add 150 g rice and 100 g skyr on top.
+Freezes in portions, reheats in the microwave. ~610 kcal</div></div>
+</section>
+
+<!-- ============ BREAKFAST ============ -->
+<section data-s="bfast" hidden>
+<h2>Breakfast</h2>
+<p class="lead">The one meal you fully control. Make it identical most weekdays. Target: <b>35&ndash;40 g protein, ~450 kcal</b>.</p>
+
+<div class="meal"><div class="m">OPTION 1 &middot; 30 SECONDS</div>
+<div class="t">Skyr bowl</div>
+<div class="d">250 g plain skyr &middot; 30 g oats &middot; a handful of frozen berries &middot; 10 g almonds.
+Stir the oats in the night before if you want it softer.<br>
+<b>~35 g protein &middot; ~430 kcal</b></div></div>
+
+<div class="meal"><div class="m">OPTION 2 &middot; 6 MINUTES</div>
+<div class="t">Eggs on rugbr&oslash;d</div>
+<div class="d">3 scrambled eggs &middot; 1 slice rugbr&oslash;d &middot; 100 g hytteost on the side &middot; tomato.<br>
+<b>~35 g protein &middot; ~470 kcal</b></div></div>
+
+<div class="meal"><div class="m">OPTION 3 &middot; MADE LAST NIGHT</div>
+<div class="t">Overnight protein oats</div>
+<div class="d">50 g oats &middot; 200 ml milk &middot; 25 g protein powder &middot; cinnamon &middot; half a banana.
+Assemble in a jar while you clear the dinner table.<br>
+<b>~38 g protein &middot; ~470 kcal</b></div></div>
+
+<div class="meal"><div class="m">OPTION 4 &middot; THE BAD MORNING</div>
+<div class="t">Shake &amp; go</div>
+<div class="d">30 g protein powder in 300 ml milk, banana, drunk standing up while finding
+someone&rsquo;s missing shoe.<br>
+<b>~34 g protein &middot; ~330 kcal</b></div></div>
+
+<div class="note"><b>Why breakfast carries so much weight here.</b> If you land 35 g of protein before
+you leave the house, you only need ~105 g across two meals you control less. Miss breakfast and
+you are chasing 140 g from lunch and dinner alone, which for a vegetarian is genuinely hard.</div>
+</section>
+
+<!-- ============ LUNCH ============ -->
+<section data-s="lunch" hidden>
+<h2>Lunch at the office</h2>
+<p class="lead">Portable or canteen. Target: <b>40&ndash;45 g protein, ~550 kcal</b>.</p>
+
+<div class="card"><h3>If you bring it</h3>
+<p>Same four slots, packed in a box. Sunday you cook the anchors; weekday-you just assembles.</p>
+<table>
+<tr><th>Anchor (cook Sunday)</th><th>Base</th><th>Flavour</th></tr>
+<tr><td>Marinated baked tofu, 150 g</td><td>Quinoa</td><td>Tahini + lemon</td></tr>
+<tr><td>Spiced chickpeas, 240 g tin</td><td>Bulgur</td><td>Skyr + garlic + dill</td></tr>
+<tr><td>Lentil &amp; feta salad</td><td>Rugbr&oslash;d on the side</td><td>Mustard vinaigrette</td></tr>
+<tr><td>Tempeh strips, 100 g</td><td>Brown rice</td><td>Peanut + soy + lime</td></tr>
+</table>
+</div>
+
+<div class="card"><h3>If you eat in the canteen</h3>
+<ul>
+<li>Take <b>double</b> of the vegetarian protein element &mdash; the eggs, the beans, the cheese, the tofu.</li>
+<li>Fill half the plate with vegetables <em>before</em> you touch the starch.</li>
+<li>One portion of the carb, not two. Skip the bread basket.</li>
+<li>Keep a tub of skyr or a shaker with a scoop of powder in your bag. It closes the protein gap
+on any canteen lunch, and canteens are where vegetarian options are usually lowest in protein.</li>
+</ul>
+</div>
+
+<div class="card"><h3>The no-cooking desk lunch</h3>
+<p>Rugbr&oslash;d &middot; 200 g hytteost &middot; 2 boiled eggs &middot; cucumber, tomato, plenty of pepper.
+~40 g protein, zero preparation. Boil a batch of eggs on Monday and keep them in the office fridge.</p>
+</div>
+</section>
+
+<!-- ============ DINNER ============ -->
+<section data-s="dinner" hidden>
+<h2>Dinner &mdash; eat what the family eats</h2>
+<p class="lead">You are not cooking a separate meal. You are adding one slot to the meal that already exists.</p>
+
+<div class="card"><h3>The add-on principle</h3>
+<p>Family dinners tend to be carb-heavy and protein-light &mdash; pasta, rice, pancakes, potatoes.
+That is fine. Take a <b>smaller portion of the base</b> and add one protein anchor:</p>
+<ul>
+<li>150 g tofu, pan-fried while the pasta boils &mdash; 6 minutes, one pan</li>
+<li>2 eggs, fried or boiled, on top of whatever it is</li>
+<li>A tin of beans or lentils stirred into your portion only</li>
+<li>200 g skyr for dessert, with berries &mdash; it counts</li>
+<li>40 g grated cheese on your half of the dish</li>
+</ul>
+<p>Every one of these is under five minutes and none requires a second recipe.</p>
+</div>
+
+<div class="card"><h3>Cook-once, split-two</h3>
+<p>The trick that removes the &ldquo;no time to cook extra for myself&rdquo; problem: cook <b>one base</b>,
+then split it into a toddler version and yours.</p>
+<table>
+<tr><th>Base</th><th>The little one gets</th><th>You get</th></tr>
+<tr><td>Tomato lentil sauce</td><td>Over small pasta, mild</td><td>Over less pasta, extra sauce, chilli, feta</td></tr>
+<tr><td>Baked potatoes</td><td>Potato + butter + cheese</td><td>1 potato + 200 g hytteost + salad</td></tr>
+<tr><td>Vegetable curry base</td><td>Mild, with rice</td><td>+ 150 g tofu or chickpeas, less rice</td></tr>
+<tr><td>Pancakes</td><td>Pancakes</td><td>Skyr in the batter + 2 eggs on the side</td></tr>
+<tr><td>Omelette / frittata</td><td>Small slice</td><td>Half the pan, made with 4 eggs</td></tr>
+</table>
+</div>
+
+<div class="warn note"><b>The leftovers problem.</b> Finishing what the 3-year-old leaves on the plate is,
+for most parents, several hundred invisible calories a day &mdash; easily the whole deficit.
+Scrape it into the bin or into a container for tomorrow. This one habit is worth more than
+any single change on this page.</div>
+
+<div class="card"><h3>Two gaps to cover, since there is no fish or meat</h3>
+<p>Nothing about a lacto-ovo vegetarian diet stops you building muscle &mdash; the protein table
+handles that. But two nutrients are genuinely harder to get, and both matter for training:</p>
+<ul>
+<li><b>Omega-3 (EPA/DHA).</b> Almost absent without fish. Flax and walnuts supply ALA, which the body
+converts poorly. An <b>algae-oil supplement</b> (250&ndash;500 mg EPA+DHA/day) closes it directly.
+Relevant to joint comfort, which matters with a shoulder you are rehabbing.</li>
+<li><b>Iron.</b> Plant iron absorbs poorly on its own. Eat the iron sources &mdash; lentils, beans,
+spinach, tofu &mdash; <b>with vitamin C</b> (peppers, tomato, citrus, broccoli), which multiplies
+absorption several-fold. Avoid tea and coffee with those meals; they do the opposite.</li>
+</ul>
+<p style="color:var(--tx3)">If you ever do want the occasional meat or fish meal, nothing here breaks
+&mdash; it just replaces one anchor. But the plan does not need it.</p>
+</div>
+</section>
+
+<!-- ============ SHOPPING ============ -->
+<section data-s="shop" hidden>
+<h2>Shopping &amp; the 40-minute Sunday</h2>
+
+<div class="card"><h3>The standing list</h3>
+<p><b>Fridge:</b> plain skyr (the big tub) &middot; hytteost &middot; kvark &middot; eggs (12+) &middot;
+firm tofu &middot; tempeh &middot; halloumi &middot; feta &middot; skummetm&aelig;lk &middot; a bag of spinach</p>
+<p><b>Cupboard:</b> tinned chickpeas &middot; tinned white and kidney beans &middot; red lentils
+&middot; tinned tomatoes &middot; oats &middot; quinoa or bulgur &middot; couscous &middot; pasta
+&middot; peanut butter &middot; tahini &middot; protein powder</p>
+<p><b>Freezer:</b> frozen berries &middot; edamame &middot; frozen spinach &middot; frozen stir-fry mix
+&middot; frozen rye bread</p>
+<p><b>Fresh:</b> whatever vegetables look good and are cheap. There is no wrong answer here.</p>
+</div>
+
+<div class="card"><h3>Forty minutes on Sunday</h3>
+<ul>
+<li>Boil 8 eggs. They live in the fridge and solve half the week&rsquo;s protein emergencies.</li>
+<li>Bake 2 blocks of pressed, cubed tofu with soy, garlic and paprika &mdash; 25 min at 200&deg;C,
+mostly unattended.</li>
+<li>Cook a big pot of quinoa or bulgur, and a batch of red lentil dahl to freeze in portions.</li>
+<li>Make one jar of sauce (tahini-lemon or skyr-garlic-dill). Sauce is what stops meal prep
+tasting like meal prep.</li>
+</ul>
+<p>Four things. After that the weekday meals are assembly, not cooking.</p>
+</div>
+
+<div class="card"><h3>Supplements &mdash; short list</h3>
+<ul>
+<li><b>Vitamin D</b> &mdash; genuinely necessary in Denmark from October to April. 20&ndash;25 &micro;g/day.</li>
+<li><b>B12</b> &mdash; important without meat or fish, even with dairy and eggs. Cheap, take it.</li>
+<li><b>Algae-based omega-3</b> &mdash; 250&ndash;500 mg EPA+DHA/day. The one supplement your diet
+most clearly needs.</li>
+<li><b>Protein powder</b> &mdash; not magic, just a convenient 24 g of protein for 120 kcal.
+Whey isolate or a pea/rice blend, whichever you prefer the taste of.</li>
+<li><b>Creatine, 5 g/day</b> &mdash; optional but higher value for you than for most: vegetarians
+start with lower muscle creatine, so the effect is larger. Well studied, safe, ~50 kr/month.</li>
+</ul>
+<p style="color:var(--tx3)">Nothing else. Fat burners and BCAAs are a tax on the hopeful.</p>
+</div>
+</section>
+
+<!-- ============ PHOTO LOGGING ============ -->
+<section data-s="log" hidden>
+<h2>Logging meals from photos</h2>
+<p class="lead">Yes, this works &mdash; and it needs no extra app.</p>
+
+<div class="card"><h3>How it works</h3>
+<ul>
+<li>Snap the plate <b>before</b> you eat. Phone camera, one photo, two seconds.</li>
+<li>Drop it into the <b>Fitness</b> chat with Claude, with a word of context if it helps
+(&ldquo;that&rsquo;s a whole tin of chickpeas&rdquo;, &ldquo;half of that went to my son&rdquo;).</li>
+<li>You get back an estimate of calories and protein, and a running daily total.</li>
+<li>End of the week: a summary of where the protein actually landed and what to change.</li>
+</ul>
+<p>Send several photos at once if you prefer &mdash; a whole day in one go works fine.</p>
+</div>
+
+<div class="card"><h3>What it is good at, and what it is not</h3>
+<p><b>Good:</b> protein estimates, portion sanity-checks, spotting the invisible calories
+(oil, cheese, the toddler&rsquo;s leftovers), and telling you whether a day was roughly on target.</p>
+<p><b>Not good:</b> precision. A photo estimate is comfortably &plusmn;15&ndash;20&#37;. Anyone claiming better,
+app or human, is guessing with more confidence.</p>
+<p>That accuracy is fine for what you need. You are not medicating a condition; you are steering
+a weekly average. The scale and the tape measure keep you honest &mdash; photos just tell you
+<em>why</em> they are doing what they are doing.</p>
+</div>
+
+<div class="note"><b>Do not log every meal forever.</b> Do it properly for <b>two weeks</b> so you learn
+what 40 g of protein and 550 kcal actually look like on a plate. After that, photograph only the
+meals you are unsure about, and the weeks where progress has stalled. Tracking is a tool for
+calibration, not a permanent condition &mdash; and with a small child at home, anything that
+demands daily perfection will be the first thing to break.</div>
+
+<div class="card"><h3>A good week looks like</h3>
+<ul>
+<li>3 gym sessions (2 is still a good week)</li>
+<li>Protein at or above 130 g on at least 5 days</li>
+<li>Two &ldquo;off-plan&rdquo; meals, eaten without any guilt whatsoever &mdash; they are in the budget</li>
+<li>8,000+ steps most days</li>
+<li>Weekly average weight down 0.3&ndash;0.5 kg</li>
+</ul>
+<p>Four out of five is a successful week. Insisting on five out of five every week is
+how people quit in November.</p>
+</div>
+</section>
+
+<footer>
+Estimates use the Mifflin&ndash;St Jeor equation with an activity factor for a sedentary job plus three
+resistance sessions per week. Individual variation is real &mdash; treat these numbers as a starting
+point to be corrected by what the scale does over three weeks, not as a measurement.
+Protein and calorie figures for foods are rounded typical values.<br><br>
+General nutrition guidance, not medical or dietary treatment. If you have a medical condition or
+are advised otherwise by a clinician, theirs is the advice that counts.
+</footer>
+</div>
+
+<script>
+var tabs=[].slice.call(document.querySelectorAll('.tab[data-t]'));
+function show(t){
+  tabs.forEach(function(b){ b.setAttribute('aria-selected', b.dataset.t===t); });
+  document.querySelectorAll('section[data-s]').forEach(function(s){ s.hidden = s.dataset.s!==t; });
+  window.scrollTo({top:0});
+}
+tabs.forEach(function(b){ b.onclick=function(){ show(b.dataset.t); }; });
+</script>
+<script>if('serviceWorker' in navigator){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js');});}</script>
+</body></html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Fitness</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0e1014">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Fitness">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{--bg:#0e1014;--card:#171b22;--card2:#1e232c;--line:#2a3140;
+ --tx:#e9edf4;--tx2:#9aa6b8;--tx3:#6b7789;--acc:#f2814f;--acc2:#5fb98a;--acc3:#4ea3e0}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--tx);min-height:100vh;
+ font:16px/1.55 ui-sans-serif,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+ padding:calc(env(safe-area-inset-top) + 28px) 16px calc(env(safe-area-inset-bottom) + 28px)}
+.wrap{max-width:640px;margin:0 auto}
+h1{font-size:24px;margin:0 0 4px;letter-spacing:-.02em}
+.sub{color:var(--tx2);font-size:13.5px;margin:0 0 22px}
+a.card{display:flex;gap:14px;align-items:center;text-decoration:none;color:inherit;
+ background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:12px}
+a.card:active{background:var(--card2)}
+.ic{flex:0 0 46px;width:46px;height:46px;border-radius:13px;display:flex;align-items:center;
+ justify-content:center;font-size:21px}
+.i1{background:rgba(242,129,79,.16);color:var(--acc)}
+.i2{background:rgba(95,185,138,.16);color:var(--acc2)}
+.i3{background:rgba(78,163,224,.16);color:var(--acc3)}
+.t{font-weight:650;font-size:16.5px;letter-spacing:-.01em}
+.d{color:var(--tx2);font-size:13px;margin-top:2px}
+.chev{color:var(--tx3);font-size:20px}
+.hint{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;
+ margin-top:20px;color:var(--tx2);font-size:13px}
+.hint b{color:var(--tx)}
+#ios{display:none}
+footer{color:var(--tx3);font-size:11.5px;margin-top:22px;line-height:1.6}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Fitness</h1>
+<p class="sub">3 sessions a week &middot; 45 min &middot; target ~74 kg lean</p>
+<div id="coach"></div>
+
+<a class="card" href="training-log.html">
+  <div class="ic i1">&#9878;</div>
+  <div style="flex:1"><div class="t">Training log</div>
+  <div class="d">Day A / B / C, demos, set logging, rest timer</div></div>
+  <div class="chev">&rsaquo;</div>
+</a>
+
+<a class="card" href="daily-log.html">
+  <div class="ic i2">&#9679;</div>
+  <div style="flex:1"><div class="t">Daily log</div>
+  <div class="d">Food today, weekly check-in, weight &amp; waist trends</div></div>
+  <div class="chev">&rsaquo;</div>
+</a>
+
+<a class="card" href="food-playbook.html">
+  <div class="ic i3">&#9998;</div>
+  <div style="flex:1"><div class="t">Food playbook</div>
+  <div class="d">Targets, the four slots, ten fast meals, shopping</div></div>
+  <div class="chev">&rsaquo;</div>
+</a>
+
+<div class="hint" id="ios">
+  <b>Add this to your home screen.</b> Tap the Share button in Safari
+  (the square with the arrow), scroll down, and choose <b>Add to Home Screen</b>.
+  It will then open full-screen like an app, and work with no signal in the gym.
+</div>
+
+<div class="hint">
+  <b>Nothing you type is stored.</b> These pages keep entries in memory only.
+  Tap <b>Copy log</b>, <b>Copy day</b> or <b>Save check-in</b> when you finish and paste it
+  into the Fitness chat with Claude &mdash; that is what builds your history.
+</div>
+
+<footer>Private to you. Works offline once loaded.</footer>
+</div>
+
+<script>
+/* show the iOS install hint only in Safari, not when already installed */
+(function(){
+  var iOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  var standalone = window.navigator.standalone === true ||
+                   window.matchMedia('(display-mode: standalone)').matches;
+  if(iOS && !standalone) document.getElementById('ios').style.display='block';
+})();
+if('serviceWorker' in navigator){
+  window.addEventListener('load',function(){ navigator.serviceWorker.register('sw.js'); });
+}
+</script>
+<script src="coach.js"></script>
+<script src="coach-ui.js"></script>
+<script>renderCoach(document.getElementById("coach"));</script>
+</body></html>
