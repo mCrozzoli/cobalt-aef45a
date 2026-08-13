@@ -128,10 +128,28 @@
     return order[(i + 1) % 3];
   }
 
+  function foodDays() {
+    var out = [];
+    try {
+      Object.keys(localStorage).forEach(function (k) {
+        if (k.indexOf(K + 'food.') !== 0) return;
+        var d = k.slice((K + 'food.').length);
+        var items = get('food.' + d, []);
+        if (!items || !items.length) return;
+        var kc = 0, pr = 0;
+        items.forEach(function (e) { kc += e.k * e.q; pr += e.p * e.q; });
+        out.push({ d: d, kcal: Math.round(kc), p: Math.round(pr), items: items });
+      });
+    } catch (e) {}
+    out.sort(function (a, b) { return a.d < b.d ? -1 : 1; });
+    return out;
+  }
+
   /* ---------- markdown export ---------- */
   function markdown() {
     var sessions = get('sessions', []);
     var checkins = get('checkins', []);
+    var food = foodDays();
     var st = status();
     var NL = String.fromCharCode(10);
     var L = [];
@@ -144,6 +162,13 @@
     L.push('- Programme week: **' + (st.stats.weeks + 1) + '**');
     L.push('- Sessions in the last 14 days: **' + st.stats.recent14 + '**');
     L.push('- Check-ins: **' + checkins.length + '**');
+    if (food.length) {
+      var ak = Math.round(food.reduce(function (s, f) { return s + f.kcal; }, 0) / food.length);
+      var ap = Math.round(food.reduce(function (s, f) { return s + f.p; }, 0) / food.length);
+      L.push('- Days of food logged: **' + food.length + '**');
+      L.push('- Average on logged days: **' + ak + ' kcal**, **' + ap + ' g protein** ' +
+             '(targets 1900 / 140)');
+    }
     L.push('');
 
     if (st.items.length) {
@@ -171,6 +196,28 @@
         notes.forEach(function (c) { L.push('- ' + c.d + ': ' + c.notes); });
         L.push('');
       }
+    }
+
+    if (food.length) {
+      L.push('## Food');
+      L.push('');
+      L.push('| Date | kcal | Protein |');
+      L.push('|---|---|---|');
+      food.slice().reverse().forEach(function (f) {
+        L.push('| ' + f.d + ' | ' + f.kcal + ' | ' + f.p + ' g |');
+      });
+      L.push('');
+      L.push('### Most recent days in detail');
+      L.push('');
+      food.slice(-3).reverse().forEach(function (f) {
+        L.push('**' + f.d + '** — ' + f.kcal + ' kcal, ' + f.p + ' g protein');
+        L.push('');
+        f.items.forEach(function (e) {
+          L.push('- ' + e.n + (e.q > 1 ? ' x' + e.q : '') + ' — ' +
+                 Math.round(e.k * e.q) + ' kcal, ' + (Math.round(e.p * e.q * 10) / 10) + ' g P');
+        });
+        L.push('');
+      });
     }
 
     if (sessions.length) {
@@ -213,5 +260,5 @@
   }
 
   window.FIT = { status: status, markdown: markdown, exportMd: exportMd,
-                 download: download, today: today, nextDay: nextDay };
+                 download: download, today: today, nextDay: nextDay, foodDays: foodDays };
 })();
