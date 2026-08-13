@@ -30,7 +30,14 @@
     'font-family:inherit;cursor:pointer;border:1px solid #2a3140;background:#1e232c;color:#e9edf4}' +
     '.savebar button.warn{color:#e0b24e}' +
     '.nostore{background:#241f12;border:1px solid #4a3d22;color:#e6d4ae;border-radius:12px;' +
-    'padding:12px;margin:12px 0;font-size:13px}';
+    'padding:12px;margin:12px 0;font-size:13px}' +
+    '.savedtag{font-size:11.5px;color:#5fb98a;margin:-2px 0 8px;font-weight:600}' +
+    '.fhist{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:8px}' +
+    '.fhist th,.fhist td{text-align:left;padding:7px 5px;border-bottom:1px solid #2a3140;color:#9aa6b8}' +
+    '.fhist th{color:#6b7789;font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:700}' +
+    '.fhist td.n,.fhist th.n{text-align:right;font-variant-numeric:tabular-nums}' +
+    '.fhist td.hit{color:#7fcaa0;font-weight:650}' +
+    '.fhist tr.today td{color:#e9edf4}';
   document.head.appendChild(css);
 
   var OK = available();
@@ -52,8 +59,25 @@
     saved.forEach(function (e) { LOG.push(e); });
     render();
   }
+  var tag = document.createElement('div');
+  tag.className = 'savedtag';
+  var gapEl = document.getElementById('gap');
+  if (gapEl && gapEl.parentNode) gapEl.parentNode.insertBefore(tag, gapEl.nextSibling);
+
+  function stamp() {
+    tag.textContent = LOG.length
+      ? '\u2713 Saved on this phone automatically \u2014 ' + today()
+      : '';
+  }
+
   var _render = render;
-  render = function () { _render(); set('food.' + today(), LOG); };
+  render = function () {
+    _render();
+    set('food.' + today(), LOG);
+    stamp();
+    if (window.paintFoodHistory) paintFoodHistory();
+  };
+  stamp();
 
   /* ---------- check-in history ---------- */
   var stored = get('checkins', []);
@@ -72,6 +96,42 @@
     });
   }
 
+  /* ---------- food history in the History tab ---------- */
+  var histSec = document.querySelector('section[data-s="hist"]');
+  var fcard = null;
+  window.paintFoodHistory = function () {
+    if (!fcard || !window.FIT) return;
+    var days = FIT.foodDays();
+    if (!days.length) {
+      fcard.querySelector('.fbody').innerHTML =
+        '<p style="color:#6b7789;font-size:13px;margin:6px 0 0">No days logged yet.</p>';
+      return;
+    }
+    var ak = Math.round(days.reduce(function (s, f) { return s + f.kcal; }, 0) / days.length);
+    var ap = Math.round(days.reduce(function (s, f) { return s + f.p; }, 0) / days.length);
+    var t = today();
+    var h2 = '<p style="font-size:13px;color:#9aa6b8;margin:0 0 4px">Average across ' +
+      days.length + (days.length === 1 ? ' day' : ' days') + ': <b style="color:#e9edf4">' +
+      ak + ' kcal</b> and <b style="color:#e9edf4">' + ap + ' g protein</b>. ' +
+      'Targets are 1900 and 140.</p>' +
+      '<table class="fhist"><tr><th>Date</th><th class="n">kcal</th><th class="n">Protein</th></tr>';
+    days.slice().reverse().slice(0, 21).forEach(function (f) {
+      h2 += '<tr' + (f.d === t ? ' class="today"' : '') + '><td>' + f.d +
+            (f.d === t ? ' <span style="color:#5fb98a">\u00b7 today</span>' : '') +
+            '</td><td class="n">' + f.kcal + '</td><td class="n' + (f.p >= 130 ? ' hit' : '') +
+            '">' + f.p + ' g</td></tr>';
+    });
+    h2 += '</table>';
+    fcard.querySelector('.fbody').innerHTML = h2;
+  };
+  if (histSec) {
+    fcard = document.createElement('div');
+    fcard.className = 'dcard';
+    fcard.innerHTML = '<h3>Food history</h3><div class="fbody"></div>';
+    var firstCard = histSec.querySelector('.card');
+    if (firstCard) histSec.insertBefore(fcard, firstCard); else histSec.appendChild(fcard);
+  }
+
   /* ---------- data card ---------- */
   var host = document.querySelector('section[data-s="how"]');
   var dc = null;
@@ -87,6 +147,11 @@
       HIST.length + (HIST.length === 1 ? ' check-in' : ' check-ins') + ' and ' +
       days + (days === 1 ? ' day' : ' days') + ' of food logged on this device.';
   }
+  document.querySelectorAll('.tab[data-t="hist"]').forEach(function (b) {
+    b.addEventListener('click', function () { if (window.paintFoodHistory) paintFoodHistory(); });
+  });
+  if (window.paintFoodHistory) paintFoodHistory();
+
   if (host) {
     dc = document.createElement('div');
     dc.className = 'dcard';
