@@ -132,7 +132,7 @@
       if (!l) return;
       var txt = l.rows.map(function (r) { return (r[0] || '?') + ' kg x ' + (r[1] || '?'); }).join('   ');
       var r2 = recFor(ex);
-      if (r2 && r2.up) txt += ' &nbsp;<i>&rarr; go to ' + r2.kg + ' kg</i>';
+      if (r2 && r2.up) txt += ' &nbsp;<i>&rarr; next notch up, about ' + r2.kg + ' kg</i>';
       var d = document.createElement('div');
       d.className = 'lastt';
       d.innerHTML = '<b>Last time (' + l.date + '):</b> ' + txt;
