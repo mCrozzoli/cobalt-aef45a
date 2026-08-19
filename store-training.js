@@ -46,7 +46,7 @@
 
   function secs() {
     return [].slice.call(document.querySelectorAll(
-      'section[data-s="A"],section[data-s="B"],section[data-s="C"]'));
+      'section[data-s="A"],section[data-s="B"],section[data-s="C"],section[data-s="D"]'));
   }
 
   /* ---------- snapshot / restore ---------- */
