@@ -122,6 +122,10 @@ button.b.p{background:var(--acc);color:#15100c;border-color:var(--acc)}
 #timer{flex:0 0 96px;text-align:center;font-variant-numeric:tabular-nums;font-weight:700;font-size:15px}
 #timer.run{color:var(--acc)}
 #timer.hold{color:var(--acc2)}
+.flabel{font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--tx3);font-weight:700}
+.seg{display:flex;gap:6px;margin-top:6px}
+.seg button{flex:1;border:1px solid var(--line);background:var(--card2);color:var(--tx2);border-radius:9px;padding:9px 4px;font-size:13px;font-family:inherit;cursor:pointer;font-weight:600}
+.seg button[aria-pressed="true"]{background:var(--acc);border-color:var(--acc);color:#08170f}
 .toast{position:fixed;left:50%;bottom:88px;transform:translateX(-50%) translateY(14px);
   background:var(--ok);color:#08130d;padding:11px 18px;border-radius:11px;font-weight:700;font-size:14px;
   opacity:0;pointer-events:none;transition:.25s;z-index:60;max-width:90vw;text-align:center}
@@ -144,7 +148,7 @@ footer{color:var(--tx3);font-size:11.5px;padding:22px 0 8px;line-height:1.6}
 
 <nav><div class="tabs" role="tablist"><a class="tab" href="./" aria-label="Home" style="text-decoration:none;display:flex;align-items:center;justify-content:center;min-width:38px;font-size:16px">&#8962;</a>
   <button class="tab" role="tab" data-t="warm" aria-selected="false">Warm-up</button>
-  <button class="tab" role="tab" data-t="A" aria-selected="false">Day A</button><button class="tab" role="tab" data-t="B" aria-selected="false">Day B</button><button class="tab" role="tab" data-t="C" aria-selected="false">Day C</button><button class="tab" role="tab" data-t="D" aria-selected="false">Day D</button>
+  <button class="tab" role="tab" data-t="A" aria-selected="false">Day A</button><button class="tab" role="tab" data-t="B" aria-selected="false">Day B</button><button class="tab" role="tab" data-t="C" aria-selected="false">Day C</button><button class="tab" role="tab" data-t="D" aria-selected="false">Day D</button><button class="tab" role="tab" data-t="cls" aria-selected="false">Class</button>
   <button class="tab" role="tab" data-t="mob" aria-selected="false">Mobility</button>
   <button class="tab" role="tab" data-t="how" aria-selected="false">How to run it</button>
 </div></nav>
@@ -201,7 +205,46 @@ footer{color:var(--tx3);font-size:11.5px;padding:22px 0 8px;line-height:1.6}
     <label>Notes<textarea class="f_notes" placeholder="Energy, sleep, what felt heavy&hellip;"></textarea></label>
   </div>
 </div>
-</section><section data-s="mob" data-title="Mobility" hidden><div class="dayhead"><h2>Desk breaks & hamstring homework</h2><p>Non-negotiable on non-gym days. Two minutes, twice a day. This matters more than any single gym session for how your body feels.</p></div><div class="simple"><div class="demo"><img data-k="Single_Leg_Glute_Bridge__0" alt=""><img class="f2" data-k="Single_Leg_Glute_Bridge__1" alt=""><span class="badge">start / end</span></div><div class="exmeta"><div class="exname">Glute bridge</div><span class="pill a">2 × 12</span><p><b style="color:var(--tx)">Why:</b> Every morning, before the day starts. Wakes the glutes up so they — not the hamstring — do the work when you stand, walk and lift. This is the highest-value two minutes in the whole plan.</p></div></div><div class="simple"><div class="demo"><img data-k="Worlds_Greatest_Stretch__0" alt=""><img class="f2" data-k="Worlds_Greatest_Stretch__1" alt=""><span class="badge">start / end</span></div><div class="exmeta"><div class="exname">World’s greatest stretch</div><span class="pill a">5 / side</span><p><b style="color:var(--tx)">Why:</b> Hip flexors, hamstring, thoracic spine and shoulder in one movement. If you only do one thing on a non-gym day, do this.</p></div></div><div class="simple"><div class="demo"><img data-k="Chest_And_Front_Of_Shoulder_Stretch__0" alt=""><img class="f2" data-k="Chest_And_Front_Of_Shoulder_Stretch__1" alt=""><span class="badge">start / end</span></div><div class="exmeta"><div class="exname">Chest &amp; front-of-shoulder stretch</div><span class="pill a">40 s / side</span><p><b style="color:var(--tx)">Why:</b> Eight hours of typing shortens the front of the shoulder and quietly pulls it into the position that hurts. Undo it in a doorway, twice a day.</p></div></div><div class="simple"><div class="demo"><img data-k="Cat_Stretch__0" alt=""><img class="f2" data-k="Cat_Stretch__1" alt=""><span class="badge">start / end</span></div><div class="exmeta"><div class="exname">Cat–Cow</div><span class="pill a">10 reps</span><p><b style="color:var(--tx)">Why:</b> Resets a spine that has held one shape too long. Do it on the floor while the little one plays.</p></div></div><div class="simple"><div class="demo"><img data-k="Calf_Stretch_Hands_Against_Wall__0" alt=""><img class="f2" data-k="Calf_Stretch_Hands_Against_Wall__1" alt=""><span class="badge">start / end</span></div><div class="exmeta"><div class="exname">Calf stretch at the wall</div><span class="pill a">45 s / side</span><p><b style="color:var(--tx)">Why:</b> Tight calves change how the hamstring loads with every step you take. Cheap fix, often overlooked.</p></div></div><div class="simple"><div class="demo"><img data-k="Glute_Ham_Raise__0" alt=""><img class="f2" data-k="Glute_Ham_Raise__1" alt=""><span class="badge">start / end</span></div><div class="exmeta"><div class="exname">Nordic / glute-ham raise — NOT YET</div><span class="pill a">Week 9+</span><p><b style="color:var(--tx)">Why:</b> The strongest hamstring-injury protector that exists. Do NOT start this now — it would flare the right side. Earn it with eight weeks of leg curls and Romanian deadlifts first, then we add it.</p></div></div></section>
+</section>
+<section data-s="cls" data-title="Class" hidden>
+<div class="dayhead"><h2>Class</h2><p>Stram op or anything else you drop into. Log it so your week counts honestly.</p></div>
+
+<div class="note"><b>You are running this right.</b> 3&ndash;5 kg, not pushing &mdash; that keeps
+Stram op as conditioning and movement practice rather than a third and fourth strength session.
+At that load it will not eat Tuesday or Thursday, which is the whole point. The lifting is what
+drives your progress; the class is for enjoyment, conditioning and getting more practice under
+a barbell with someone watching your technique.</div>
+
+<div class="note warn"><b>Watch for the weight creeping up.</b> At 3&ndash;5 kg the deadlift and
+squat blocks are a movement drill and your hamstring is in no danger. The risk is drift: a month in,
+the room is using 10 kg and so are you, without ever deciding to. Going heavier is a decision to make
+deliberately &mdash; and not before the anaemia has resolved. Log the effort each time; if
+&ldquo;Hard&rdquo; starts appearing, that is the signal.</div>
+
+<div class="card">
+  <div class="row">
+    <label class="f">Date<input class="c_date" type="date"></label>
+    <label class="f">Class<input class="c_name" type="text" value="Stram op"></label>
+  </div>
+  <div class="row" style="margin-top:10px">
+    <label class="f">Minutes<input class="c_min" type="text" inputmode="numeric" placeholder="55"></label>
+    <label class="f">Bodyweight (kg)<input class="c_bw" type="text" inputmode="decimal" placeholder="optional"></label>
+  </div>
+  <div style="margin-top:12px">
+    <div class="flabel">How hard was it?</div>
+    <div class="seg" id="c_rpe"></div>
+  </div>
+  <div class="row" style="margin-top:12px">
+    <label class="f">Hamstring / shoulder<input class="c_pain" type="text" placeholder="e.g. hamstring fine, shoulder ok"></label>
+  </div>
+  <div class="row" style="margin-top:10px">
+    <label class="f">Notes<textarea class="c_notes" placeholder="What was in it? Anything that hurt?"></textarea></label>
+  </div>
+</div>
+
+<div class="card" id="clshist"><h3 style="margin:0 0 6px;font-size:15px">Classes logged</h3><div class="clsbody"></div></div>
+</section>
+<section data-s="mob" data-title="Mobility" hidden><div class="dayhead"><h2>Desk breaks & hamstring homework</h2><p>Non-negotiable on non-gym days. Two minutes, twice a day. This matters more than any single gym session for how your body feels.</p></div><div class="simple"><div class="demo"><img data-k="Single_Leg_Glute_Bridge__0" alt=""><img class="f2" data-k="Single_Leg_Glute_Bridge__1" alt=""><span class="badge">start / end</span></div><div class="exmeta"><div class="exname">Glute bridge</div><span class="pill a">2 × 12</span><p><b style="color:var(--tx)">Why:</b> Every morning, before the day starts. Wakes the glutes up so they — not the hamstring — do the work when you stand, walk and lift. This is the highest-value two minutes in the whole plan.</p></div></div><div class="simple"><div class="demo"><img data-k="Worlds_Greatest_Stretch__0" alt=""><img class="f2" data-k="Worlds_Greatest_Stretch__1" alt=""><span class="badge">start / end</span></div><div class="exmeta"><div class="exname">World’s greatest stretch</div><span class="pill a">5 / side</span><p><b style="color:var(--tx)">Why:</b> Hip flexors, hamstring, thoracic spine and shoulder in one movement. If you only do one thing on a non-gym day, do this.</p></div></div><div class="simple"><div class="demo"><img data-k="Chest_And_Front_Of_Shoulder_Stretch__0" alt=""><img class="f2" data-k="Chest_And_Front_Of_Shoulder_Stretch__1" alt=""><span class="badge">start / end</span></div><div class="exmeta"><div class="exname">Chest &amp; front-of-shoulder stretch</div><span class="pill a">40 s / side</span><p><b style="color:var(--tx)">Why:</b> Eight hours of typing shortens the front of the shoulder and quietly pulls it into the position that hurts. Undo it in a doorway, twice a day.</p></div></div><div class="simple"><div class="demo"><img data-k="Cat_Stretch__0" alt=""><img class="f2" data-k="Cat_Stretch__1" alt=""><span class="badge">start / end</span></div><div class="exmeta"><div class="exname">Cat–Cow</div><span class="pill a">10 reps</span><p><b style="color:var(--tx)">Why:</b> Resets a spine that has held one shape too long. Do it on the floor while the little one plays.</p></div></div><div class="simple"><div class="demo"><img data-k="Calf_Stretch_Hands_Against_Wall__0" alt=""><img class="f2" data-k="Calf_Stretch_Hands_Against_Wall__1" alt=""><span class="badge">start / end</span></div><div class="exmeta"><div class="exname">Calf stretch at the wall</div><span class="pill a">45 s / side</span><p><b style="color:var(--tx)">Why:</b> Tight calves change how the hamstring loads with every step you take. Cheap fix, often overlooked.</p></div></div><div class="simple"><div class="demo"><img data-k="Glute_Ham_Raise__0" alt=""><img class="f2" data-k="Glute_Ham_Raise__1" alt=""><span class="badge">start / end</span></div><div class="exmeta"><div class="exname">Nordic / glute-ham raise — NOT YET</div><span class="pill a">Week 9+</span><p><b style="color:var(--tx)">Why:</b> The strongest hamstring-injury protector that exists. Do NOT start this now — it would flare the right side. Earn it with eight weeks of leg curls and Romanian deadlifts first, then we add it.</p></div></div></section>
 <section data-s="how" data-title="How to run it" hidden>
 <div class="dayhead"><h2>How to run it</h2><p>The rules that make the difference.</p></div>
 
@@ -213,6 +256,10 @@ footer{color:var(--tx3);font-size:11.5px;padding:22px 0 8px;line-height:1.6}
 which is exactly where things get cut when you are short of time &mdash; and it is the one part that
 is actually treating the shoulder and the hamstring. At the front it costs you six minutes of a
 session you have already committed to.</p>
+<p><b>The week.</b> Mon Stram op (light) &middot; Tue Day A &middot; Wed Stram op (light) &middot;
+Thu Day B &middot; Fri rest &middot; Sat Day C &middot; Sun rest. That is five sessions, two real rest
+days, and the three lifting days spaced 48 hours apart. Day D is a bonus for weeks you want it,
+not part of the standard week.</p>
 <p><b>When time runs out</b>, cut superset 3 first, then the finisher. Never the row, never the rehab block.</p></div>
 
 <div class="info"><h3>The week</h3>
