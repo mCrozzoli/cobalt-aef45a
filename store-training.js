@@ -218,6 +218,80 @@
     };
   });
 
+
+  /* ---------- class sessions (Stram op etc.) ---------- */
+  var clsSec = document.querySelector('section[data-s="cls"]');
+  if (clsSec) {
+    var RPE = ['Easy','Steady','Solid','Hard','Brutal'];
+    var rpeVal = null;
+    var rpeEl = document.getElementById('c_rpe');
+    if (rpeEl) {
+      rpeEl.innerHTML = RPE.map(function (v) {
+        return '<button aria-pressed="false" data-v="' + v + '">' + v + '</button>';
+      }).join('');
+      rpeEl.querySelectorAll('button').forEach(function (b2) {
+        b2.onclick = function () {
+          rpeEl.querySelectorAll('button').forEach(function (x) { x.setAttribute('aria-pressed','false'); });
+          b2.setAttribute('aria-pressed','true'); rpeVal = b2.dataset.v;
+        };
+      });
+    }
+
+    function cv(c) { var e = clsSec.querySelector('.' + c); return e ? e.value.trim() : ''; }
+
+    function paintClasses() {
+      var body = clsSec.querySelector('.clsbody');
+      if (!body) return;
+      var cl = sessions.filter(function (s) { return s.day === 'Class'; });
+      if (!cl.length) {
+        body.innerHTML = '<p style="color:#6b7789;font-size:13px;margin:4px 0 0">Nothing logged yet.</p>';
+        return;
+      }
+      var h2 = '<table class="fhist" style="width:100%;border-collapse:collapse;font-size:12.5px">' +
+               '<tr><th style="text-align:left;padding:6px 4px;color:#6b7789;font-size:10px;' +
+               'letter-spacing:.06em;text-transform:uppercase">Date</th>' +
+               '<th style="text-align:left;padding:6px 4px;color:#6b7789;font-size:10px;' +
+               'letter-spacing:.06em;text-transform:uppercase">Class</th>' +
+               '<th style="text-align:left;padding:6px 4px;color:#6b7789;font-size:10px;' +
+               'letter-spacing:.06em;text-transform:uppercase">Min</th>' +
+               '<th style="text-align:left;padding:6px 4px;color:#6b7789;font-size:10px;' +
+               'letter-spacing:.06em;text-transform:uppercase">Effort</th></tr>';
+      cl.slice().reverse().slice(0, 12).forEach(function (s) {
+        h2 += '<tr><td style="padding:6px 4px;border-top:1px solid #2a3140;color:#9aa6b8">' + s.date +
+              '</td><td style="padding:6px 4px;border-top:1px solid #2a3140;color:#9aa6b8">' + (s.cls || '-') +
+              '</td><td style="padding:6px 4px;border-top:1px solid #2a3140;color:#9aa6b8">' + (s.mins || '-') +
+              '</td><td style="padding:6px 4px;border-top:1px solid #2a3140;color:#9aa6b8">' + (s.rpe || '-') + '</td></tr>';
+      });
+      body.innerHTML = h2 + '</table>';
+    }
+
+    var cbar = document.createElement('div');
+    cbar.className = 'savebar';
+    var csave = document.createElement('button');
+    csave.className = 'p'; csave.textContent = 'Save class';
+    cbar.appendChild(csave);
+    clsSec.appendChild(cbar);
+
+    csave.onclick = function () {
+      var d = cv('c_date');
+      if (!d) { say('Pick a date first'); return; }
+      var rec = { date: d, day: 'Class', cls: cv('c_name') || 'Class',
+                  mins: cv('c_min') || '55', rpe: rpeVal || '',
+                  bw: cv('c_bw'), pain: cv('c_pain'), notes: cv('c_notes'), ex: {} };
+      sessions.push(rec);
+      sessions.sort(function (a, b2) { return a.date < b2.date ? -1 : 1; });
+      if (!set('sessions', sessions)) { say('Could not save'); return; }
+      ['c_min','c_bw','c_pain','c_notes'].forEach(function (c) {
+        var e = clsSec.querySelector('.' + c); if (e) e.value = '';
+      });
+      if (rpeEl) { rpeEl.querySelectorAll('button').forEach(function (x) { x.setAttribute('aria-pressed','false'); }); }
+      rpeVal = null;
+      paintClasses(); renderData();
+      say('Class saved');
+    };
+    paintClasses();
+  }
+
   /* ---------- data card in the How tab ---------- */
   var host = document.querySelector('section[data-s="how"]');
   var dc = null;
