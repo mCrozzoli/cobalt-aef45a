@@ -54,7 +54,8 @@
     var items = [];
 
     var first = sessions.length ? sessions[0].date : null;
-    var last = sessions.length ? sessions[sessions.length - 1].date : null;
+    var lifts = sessions.filter(function (s) { return s.day !== 'Class'; });
+    var last = lifts.length ? lifts[lifts.length - 1].date : null;
     var weeks = Math.floor(days(first || START, t) / 7);
 
     var recent = sessions.filter(function (s) { return days(s.date, t) <= 7; }).length;
@@ -122,9 +123,10 @@
   }
 
   function nextDay(sessions) {
-    if (!sessions.length) return 'A';
+    var lifts = sessions.filter(function (s) { return ['A','B','C'].indexOf(s.day) >= 0; });
+    if (!lifts.length) return 'A';
     var order = ['A', 'B', 'C'];
-    var i = order.indexOf(sessions[sessions.length - 1].day);
+    var i = order.indexOf(lifts[lifts.length - 1].day);
     return order[(i + 1) % 3];
   }
 
@@ -218,6 +220,46 @@
         });
         L.push('');
       });
+    }
+
+    var uses = get('uses', {});
+    var names = Object.keys(uses).sort(function (a, b) { return uses[b].c - uses[a].c; });
+    if (names.length) {
+      var totalTaps = names.reduce(function (s, n) { return s + uses[n].c; }, 0);
+      L.push('## Button usage');
+      L.push('');
+      L.push(totalTaps + ' taps across ' + names.length + ' distinct items. ' +
+             'Use this to decide which buttons to keep, merge or drop.');
+      L.push('');
+      L.push('| Item | Times | kcal | Protein |');
+      L.push('|---|---|---|---|');
+      names.forEach(function (n) {
+        L.push('| ' + n + ' | ' + uses[n].c + ' | ' + uses[n].k + ' | ' + uses[n].p + ' g |');
+      });
+      L.push('');
+      var never = [];
+      if (typeof LIB !== 'undefined') {
+        LIB.forEach(function (g) {
+          g[1].forEach(function (it) { if (!uses[it[0]]) never.push(it[0]); });
+        });
+      }
+      if (never.length) {
+        L.push('**Never tapped (' + never.length + '):** ' + never.join(', '));
+        L.push('');
+      }
+    }
+
+    var classes = sessions.filter(function (s) { return s.day === 'Class'; });
+    if (classes.length) {
+      L.push('## Classes');
+      L.push('');
+      L.push('| Date | Class | Min | Effort | Notes |');
+      L.push('|---|---|---|---|---|');
+      classes.slice().reverse().forEach(function (s) {
+        L.push('| ' + s.date + ' | ' + (s.cls||'-') + ' | ' + (s.mins||'-') + ' | ' +
+               (s.rpe||'-') + ' | ' + ((s.pain? s.pain+' ':'') + (s.notes||'')).trim() + ' |');
+      });
+      L.push('');
     }
 
     if (sessions.length) {
