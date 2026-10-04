@@ -1,3 +1,4 @@
+window.FITV = window.FITV || {}; FITV['store-training'] = '19';
 /* Persistence for the training log. Runs only on the hosted site.
    Everything is stored in this browser on this device. Nothing is sent anywhere. */
 (function () {
@@ -44,9 +45,52 @@
   var OK = available();
   var sessions = OK ? get('sessions', []) : [];
 
+  /* ---------- one-off renames: keep history attached to the new names ---------- */
+  var RENAME = { 'Standing calf raise': 'Calf press machine' };
+  (function () {
+    if (!OK) return;
+    var changed = false;
+    function fix(o) {
+      if (!o || !o.ex) return false;
+      var c = false;
+      Object.keys(RENAME).forEach(function (old) {
+        if (o.ex[old]) {
+          if (!o.ex[RENAME[old]]) o.ex[RENAME[old]] = o.ex[old];
+          delete o.ex[old]; c = true;
+        }
+      });
+      return c;
+    }
+    sessions.forEach(function (s) { if (fix(s)) changed = true; });
+    if (changed) set('sessions', sessions);
+    ['A', 'B', 'C', 'D', 'H'].forEach(function (d) {
+      var dr = get('draft.' + d, null);
+      if (fix(dr)) set('draft.' + d, dr);
+    });
+  })();
+
+  /* ---------- "watch how" video link on every exercise ---------- */
+  css.textContent += '.yt{display:inline-block;margin-top:6px;font-size:12.5px;font-weight:650;' +
+    'color:#7fb4ff;text-decoration:none;padding:3px 9px;border:1px solid #2a3a55;border-radius:999px;background:#151c28}';
+  document.querySelectorAll('.ex .exmeta, .simple .exmeta').forEach(function (m) {
+    if (m.querySelector('.yt')) return;
+    var nm = m.querySelector('.exname');
+    if (!nm) return;
+    var q = nm.textContent.replace(/\(.*?\)/g, '').replace(/[—–·]/g, ' ').replace(/\bDB\b/g, 'dumbbell')
+      .replace(/\s+/g, ' ').trim() + ' proper form';
+    var a = document.createElement('a');
+    a.className = 'yt'; a.target = '_blank'; a.rel = 'noopener';
+    a.href = 'https://www.youtube.com/results?search_query=' + encodeURIComponent(q);
+    a.innerHTML = '&#9654; Watch how';
+    var pill = m.querySelector('.pill');
+    var wrap = document.createElement('div');
+    wrap.appendChild(a);
+    if (pill && pill.nextSibling) m.insertBefore(wrap, pill.nextSibling); else m.appendChild(wrap);
+  });
+
   function secs() {
     return [].slice.call(document.querySelectorAll(
-      'section[data-s="A"],section[data-s="B"],section[data-s="C"],section[data-s="D"]'));
+      'section[data-s="A"],section[data-s="B"],section[data-s="C"],section[data-s="D"],section[data-s="H"]'));
   }
 
   /* ---------- snapshot / restore ---------- */
@@ -331,7 +375,7 @@
       var l = ['TRAINING HISTORY'];
       sessions.forEach(function (s) {
         l.push('');
-        l.push(s.date + '  Day ' + (s.day || '?') + (s.bw ? '  (' + s.bw + ' kg)' : ''));
+        l.push(s.date + '  ' + (s.day === 'H' ? 'Hotel' : 'Day ' + (s.day || '?')) + (s.bw ? '  (' + s.bw + ' kg)' : ''));
         Object.keys(s.ex).forEach(function (k) {
           var rows = s.ex[k].filter(function (r) { return r[0] || r[1]; });
           if (rows.length) {

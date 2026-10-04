@@ -1,3 +1,4 @@
+window.FITV = window.FITV || {}; FITV['coach-ui'] = '19';
 /* Renders the coach panel. Used by index.html and the training log. */
 (function () {
   var STYLE =
@@ -38,8 +39,8 @@
         ? Math.round((new Date(FIT.today()) - new Date(st.stats.last)) / 86400000)
         : null;
       h += '<div class="cstat">' +
-           '<div><div class="n">' + (st.stats.weeks + 1) + '</div><div class="l">Week</div></div>' +
-           '<div><div class="n">' + st.stats.sessions + '</div><div class="l">Sessions</div></div>' +
+           '<div><div class="n">' + st.stats.wk + '</div><div class="l">' + st.stats.wkLabel + '</div></div>' +
+           '<div><div class="n">' + st.stats.next + '</div><div class="l">Next day</div></div>' +
            '<div><div class="n">' + st.stats.recent + '</div><div class="l">Last 7 days</div></div>' +
            '<div><div class="n">' + (days === null ? '—' : days + 'd') + '</div>' +
            '<div class="l">Since last</div></div>' +
@@ -60,3 +61,23 @@
     el.innerHTML = h;
   };
 })();
+
+/* Version check: every page and script carries the same version number.
+   If the site ends up with a mix of old and new files, say so plainly. */
+window.addEventListener('load', function () {
+  var m = document.querySelector('meta[name="fitv"]');
+  if (!m) return;
+  var want = m.getAttribute('content'), bad = [];
+  [].slice.call(document.querySelectorAll('script[src]')).forEach(function (sc) {
+    var n = (sc.getAttribute('src') || '').split('/').pop().replace(/\.js.*$/, '');
+    if (!n) return;
+    if (!window.FITV || FITV[n] !== want) bad.push(n + '.js');
+  });
+  if (!bad.length) return;
+  var b = document.createElement('div');
+  b.style.cssText = 'position:sticky;top:0;z-index:99;background:#3a2e12;color:#f1dca8;border-bottom:1px solid #6b5420;' +
+    'padding:10px 14px;font:600 13px/1.4 -apple-system,system-ui,sans-serif';
+  b.innerHTML = 'Out-of-date files on the site: ' + bad.join(', ') + '. Upload <b>all</b> files from the ' +
+    'cobalt-aef45a folder to GitHub again, then reload.';
+  document.body.insertBefore(b, document.body.firstChild);
+});

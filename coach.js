@@ -1,8 +1,10 @@
+window.FITV = window.FITV || {}; FITV['coach'] = '19';
 /* Shared coaching logic + markdown export.
    Reads only localStorage on this device. Exposes window.FIT. */
 (function () {
   var K = 'fit.v1.';
-  var START = '2026-08-10';          // week 0 of the programme
+  var START = '2026-08-10';          // week 0 of the programme (v1)
+  var V2 = '2026-10-12';             // version 2 (A / B / optional C) starts
 
   function get(k, d) {
     try { var v = localStorage.getItem(K + k); return v == null ? d : JSON.parse(v); }
@@ -81,19 +83,26 @@
 
     /* --- phase of the programme --- */
     if (sessions.length) {
-      if (weeks >= 9) {
-        items.push({ level: 'act', title: 'Week ' + (weeks + 1) + ' — time to rewrite the programme',
-          text: 'You have been on this one long enough for it to have done its job. Export your log below and send it to Claude for version 2 — new variations, and a decision on Nordic hamstring curls.' });
-      } else if (weeks >= 7) {
-        items.push({ level: 'act', title: 'Week ' + (weeks + 1) + ' — deload week',
-          text: 'Same exercises, same reps, about 70% of the weight, for one week. This is recovery, not laziness, and skipping it is how weeks 9-12 go badly.' });
-      } else if (weeks >= 3) {
-        items.push({ level: 'info', title: 'Week ' + (weeks + 1) + ' — build phase',
-          text: 'Keep adding weight whenever a lift hits the top of its rep range. Deload lands in week ' + (8 - weeks) + ' more week' + ((8 - weeks) === 1 ? '' : 's') + '.' });
-      }
-      if (weeks >= 8) {
+      if (t < V2) {
+        items.push({ level: 'act', title: 'Deload week — then version 2 starts on ' + V2,
+          text: 'Same exercises, same reps, about 70% of the weight (or the Hotel tab if you are travelling). From ' + V2 + ' the new Day A / Day B / optional Day C take over.' });
         items.push({ level: 'act', title: 'Eight-week injury review',
-          text: 'Compare the right hamstring and shoulder with how they felt at the start. Genuinely better: carry on. Unchanged after eight weeks of loading: book a physiotherapist. That is the whole point of the deadline.' });
+          text: 'You logged the hamstring as "same" after eight weeks of loading. That was the agreed trigger: book a physiotherapist, and mention the right inner elbow too. Keep training meanwhile.' });
+      } else {
+        var w2 = Math.floor(days(V2, t) / 7);
+        if (w2 >= 8) {
+          items.push({ level: 'act', title: 'Version 2, week ' + (w2 + 1) + ' — time for the next rewrite',
+            text: 'Export your log below and send it to Claude for version 3.' });
+        } else if (w2 === 6) {
+          items.push({ level: 'act', title: 'Version 2, week 7 — deload week',
+            text: 'Same exercises, same reps, about 70% of the weight, for one week.' });
+        } else if (w2 <= 1) {
+          items.push({ level: 'info', title: 'Version 2, week ' + (w2 + 1) + ' — settle in',
+            text: 'Main lifts now run 6–10 reps. Start at the weights shown on each card and let double progression do the rest. A then B; Day C only if the week allows.' });
+        } else {
+          items.push({ level: 'info', title: 'Version 2, week ' + (w2 + 1) + ' — build phase',
+            text: 'Add weight whenever a lift hits the top of its rep range on every set. Deload in week 7.' });
+        }
       }
     }
 
@@ -118,16 +127,17 @@
     return {
       items: items,
       stats: { sessions: sessions.length, weeks: weeks, last: last, first: first,
+               wk: t >= V2 ? Math.floor(days(V2, t) / 7) + 1 : weeks + 1,
+               wkLabel: t >= V2 ? 'v2 week' : 'Week', next: nextDay(sessions),
                recent: recent, recent14: recent14, checkins: checkins.length }
     };
   }
 
   function nextDay(sessions) {
-    var lifts = sessions.filter(function (s) { return ['A','B','C'].indexOf(s.day) >= 0; });
+    /* v2: A and B alternate; C is an optional extra and does not move the queue */
+    var lifts = sessions.filter(function (s) { return s.day === 'A' || s.day === 'B'; });
     if (!lifts.length) return 'A';
-    var order = ['A', 'B', 'C'];
-    var i = order.indexOf(lifts[lifts.length - 1].day);
-    return order[(i + 1) % 3];
+    return lifts[lifts.length - 1].day === 'A' ? 'B' : 'A';
   }
 
   function foodDays() {
@@ -147,10 +157,25 @@
     return out;
   }
 
+  /* days with fewer kcal than this were almost certainly only partly logged */
+  var PARTIAL = 1200;
+  function foodAvg(list) {
+    var full = list.filter(function (f) { return f.kcal >= PARTIAL; });
+    if (!full.length) return { n: 0, k: 0, p: 0 };
+    return { n: full.length,
+             k: Math.round(full.reduce(function (s, f) { return s + f.kcal; }, 0) / full.length),
+             p: Math.round(full.reduce(function (s, f) { return s + f.p; }, 0) / full.length) };
+  }
+  function dedupe(cs) {
+    var by = {};
+    cs.forEach(function (c) { by[c.d] = c; });
+    return Object.keys(by).sort().map(function (d) { return by[d]; });
+  }
+
   /* ---------- markdown export ---------- */
   function markdown() {
     var sessions = get('sessions', []);
-    var checkins = get('checkins', []);
+    var checkins = dedupe(get('checkins', []));
     var food = foodDays();
     var st = status();
     var NL = String.fromCharCode(10);
@@ -161,15 +186,21 @@
     L.push('Exported ' + today() + ' from the Fitness app.');
     L.push('');
     L.push('- Sessions logged: **' + sessions.length + '**');
-    L.push('- Programme week: **' + (st.stats.weeks + 1) + '**');
+    L.push('- Programme: **' + (today() < V2 ? 'v1, week ' + (st.stats.weeks + 1) + ' (deload)' :
+           'v2 (A / B / optional C), week ' + (Math.floor(days(V2, today()) / 7) + 1)) + '**');
     L.push('- Sessions in the last 14 days: **' + st.stats.recent14 + '**');
     L.push('- Check-ins: **' + checkins.length + '**');
     if (food.length) {
-      var ak = Math.round(food.reduce(function (s, f) { return s + f.kcal; }, 0) / food.length);
-      var ap = Math.round(food.reduce(function (s, f) { return s + f.p; }, 0) / food.length);
-      L.push('- Days of food logged: **' + food.length + '**');
-      L.push('- Average on logged days: **' + ak + ' kcal**, **' + ap + ' g protein** ' +
-             '(targets 1900 / 140)');
+      var fa = foodAvg(food);
+      L.push('- Days of food logged: **' + food.length + '** (' + fa.n + ' complete, ' +
+             (food.length - fa.n) + ' partly logged — under ' + PARTIAL + ' kcal, left out of the averages)');
+      if (fa.n) {
+        L.push('- Average on complete days: **' + fa.k + ' kcal**, **' + fa.p + ' g protein** ' +
+               '(targets 1900 / 140)');
+        var l14 = foodAvg(food.filter(function (f) { return days(f.d, today()) <= 14; }));
+        if (l14.n) L.push('- Last 14 days, complete days only: **' + l14.k + ' kcal**, **' + l14.p +
+                          ' g protein** (' + l14.n + ' day' + (l14.n === 1 ? '' : 's') + ')');
+      }
     }
     L.push('');
 
@@ -203,10 +234,10 @@
     if (food.length) {
       L.push('## Food');
       L.push('');
-      L.push('| Date | kcal | Protein |');
-      L.push('|---|---|---|');
+      L.push('| Date | kcal | Protein | |');
+      L.push('|---|---|---|---|');
       food.slice().reverse().forEach(function (f) {
-        L.push('| ' + f.d + ' | ' + f.kcal + ' | ' + f.p + ' g |');
+        L.push('| ' + f.d + ' | ' + f.kcal + ' | ' + f.p + ' g' + (f.kcal < PARTIAL ? ' | partial' : ' | ') + ' |');
       });
       L.push('');
       L.push('### Most recent days in detail');
@@ -266,7 +297,8 @@
       L.push('## Sessions');
       L.push('');
       sessions.slice().reverse().forEach(function (s) {
-        L.push('### ' + s.date + ' — Day ' + (s.day || '?') + (s.bw ? ' — ' + s.bw + ' kg' : ''));
+        if (s.day === 'Class') return;
+        L.push('### ' + s.date + ' — ' + (s.day === 'H' ? 'Hotel (dumbbells)' : 'Day ' + (s.day || '?') + (s.date >= V2 ? ' (v2)' : '')) + (s.bw ? ' — ' + s.bw + ' kg' : ''));
         L.push('');
         Object.keys(s.ex).forEach(function (k) {
           var rows = s.ex[k].filter(function (r) { return r[0] || r[1]; });
@@ -302,5 +334,6 @@
   }
 
   window.FIT = { status: status, markdown: markdown, exportMd: exportMd,
-                 download: download, today: today, nextDay: nextDay, foodDays: foodDays };
+                 download: download, today: today, nextDay: nextDay, foodDays: foodDays,
+                 foodAvg: foodAvg, PARTIAL: PARTIAL, dedupe: dedupe };
 })();

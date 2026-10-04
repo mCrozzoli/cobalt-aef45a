@@ -1,3 +1,4 @@
+window.FITV = window.FITV || {}; FITV['store-daily'] = '19';
 /* Persistence for the daily log. Hosted site only.
    Stored in this browser on this device; nothing is transmitted. */
 (function () {
@@ -37,7 +38,8 @@
     '.fhist th{color:#6b7789;font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:700}' +
     '.fhist td.n,.fhist th.n{text-align:right;font-variant-numeric:tabular-nums}' +
     '.fhist td.hit{color:#7fcaa0;font-weight:650}' +
-    '.fhist tr.today td{color:#e9edf4}';
+    '.fhist tr.today td{color:#e9edf4}' +
+                                    '.fhist tr.today td{color:#e9edf4}';
   document.head.appendChild(css);
 
   var OK = available();
@@ -79,6 +81,19 @@
   };
   stamp();
 
+  /* ---------- silent usage counting ----------
+     No UI. The library stays exactly as it is so the tap counts measure what
+     Miguel eats, not what the app puts within easy reach. Counts ride along in
+     the markdown export; we prune the buttons later, from evidence. */
+  var uses = get('uses', {});
+  var _add = window.add;
+  window.add = function (n, k, p) {
+    if (!uses[n]) uses[n] = { k: k, p: p, c: 0 };
+    uses[n].c++; uses[n].k = k; uses[n].p = p;
+    set('uses', uses);
+    _add(n, k, p);
+  };
+
   /* ---------- check-in history ---------- */
   var stored = get('checkins', []);
   if (stored.length) {
@@ -92,7 +107,13 @@
   var wadd = document.getElementById('wadd');
   if (wadd) {
     wadd.addEventListener('click', function () {
-      setTimeout(function () { set('checkins', HIST); renderData(); }, 60);
+      setTimeout(function () {
+        var by = {};
+        HIST.forEach(function (e) { by[e.d] = e; });           // one check-in per date, newest wins
+        var keep = Object.keys(by).sort().map(function (d) { return by[d]; });
+        HIST.length = 0; keep.forEach(function (e) { HIST.push(e); });
+        set('checkins', HIST); renderData(); drawAll();
+      }, 60);
     });
   }
 
@@ -107,16 +128,21 @@
         '<p style="color:#6b7789;font-size:13px;margin:6px 0 0">No days logged yet.</p>';
       return;
     }
-    var ak = Math.round(days.reduce(function (s, f) { return s + f.kcal; }, 0) / days.length);
-    var ap = Math.round(days.reduce(function (s, f) { return s + f.p; }, 0) / days.length);
     var t = today();
-    var h2 = '<p style="font-size:13px;color:#9aa6b8;margin:0 0 4px">Average across ' +
-      days.length + (days.length === 1 ? ' day' : ' days') + ': <b style="color:#e9edf4">' +
-      ak + ' kcal</b> and <b style="color:#e9edf4">' + ap + ' g protein</b>. ' +
-      'Targets are 1900 and 140.</p>' +
+    var past = days.filter(function (f) { return f.d !== t; });   // today is still in progress
+    var fa = FIT.foodAvg(past);
+    var nPart = past.length - fa.n;
+    var h2 = '<p style="font-size:13px;color:#9aa6b8;margin:0 0 4px">' + (fa.n
+      ? 'Average across ' + fa.n + ' complete ' + (fa.n === 1 ? 'day' : 'days') + ': <b style="color:#e9edf4">' +
+        fa.k + ' kcal</b> and <b style="color:#e9edf4">' + fa.p + ' g protein</b>. Targets are 1900 and 140.'
+      : 'No complete days yet.') +
+      (nPart ? ' <span style="color:#6b7789">' + nPart + (nPart === 1 ? ' day' : ' days') +
+        ' under ' + FIT.PARTIAL + ' kcal look partly logged and are left out (shown dimmed).</span>' : '') +
+      '</p>' +
       '<table class="fhist"><tr><th>Date</th><th class="n">kcal</th><th class="n">Protein</th></tr>';
     days.slice().reverse().slice(0, 21).forEach(function (f) {
-      h2 += '<tr' + (f.d === t ? ' class="today"' : '') + '><td>' + f.d +
+      var part = f.d !== t && f.kcal < FIT.PARTIAL;
+      h2 += '<tr' + (f.d === t ? ' class="today"' : part ? ' style="opacity:.45"' : '') + '><td>' + f.d +
             (f.d === t ? ' <span style="color:#5fb98a">\u00b7 today</span>' : '') +
             '</td><td class="n">' + f.kcal + '</td><td class="n' + (f.p >= 130 ? ' hit' : '') +
             '">' + f.p + ' g</td></tr>';
